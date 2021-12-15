@@ -25,7 +25,7 @@ public class Agent : MonoBehaviour
                 transform.position += dirToTarget * agentSpeed * Time.deltaTime;
 
                 Vector3 distanceToTarget = currentPath[pathIndex].transform.position - transform.position;
-                if(distanceToTarget.sqrMagnitude < 0.01f)
+                if(distanceToTarget.sqrMagnitude < 0.001f)
                 {
                     transform.position = currentPath[pathIndex].transform.position;
                     //Update the next target.
@@ -33,7 +33,6 @@ public class Agent : MonoBehaviour
                     if(pathIndex >= currentPath.Count)
                     {
                         moving = false;
-                        Debug.Log("Movement stopped");
                         return;
                     }
 

@@ -4,39 +4,88 @@ using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
 {
+    public static GameplayManager instance;
+
     [SerializeField] private Agent startAgent;
     [SerializeField] private GameObject targetObject;
 
+    private Tile lastStarttile = null;
+    private Tile lastTargetTile = null;
 
-    public bool testBool = false;
 
-    private void Update() 
+
+
+    private void Awake() 
     {
-        if(testBool)
+        instance = this;
+    }
+
+    private void Start() 
+    {
+        //Default start and target positions.
+        Tile startTile = TileManager.instance.Tiles[0];
+        Tile targetTile = TileManager.instance.Tiles[TileManager.instance.Tiles.Count-1];
+        
+        SetAgentPositionToTile(startTile);
+        SetTargetPositionToTile(targetTile);
+
+    }
+ 
+
+
+    public void StartMovement(PathfindingManager.Algorithms algoType)
+    {
+        List<Tile> path = null;
+
+        if(algoType == PathfindingManager.Algorithms.Astar)
         {
-            TestStartMovement();
-            testBool = false;
+            float startAstarTime = Time.realtimeSinceStartup;
+
+            for(int i =0; i < 1000;i++)
+            {
+                path = PathfindingManager.instance.AStarAlgorithmPathfinding(lastStarttile,lastTargetTile);
+            }
+
+            float endAstarTime = Time.realtimeSinceStartup;
+
+            Debug.Log("A*star Time = " + (endAstarTime - startAstarTime));
+        }
+
+        else
+        {
+            float startDijkstraTime = Time.realtimeSinceStartup;
+
+
+            for(int i=0; i < 1000;i++)
+            {
+            path = PathfindingManager.instance.DijkstraAlgorithmPathfinding(lastStarttile,lastTargetTile);
+            }
+        
+            float endDijkstraTime = Time.realtimeSinceStartup;
+
+            Debug.Log("Dijkstra Time = " + (endDijkstraTime - startDijkstraTime));
+            startAgent.StartMovement(path);
         }
     }
 
-
-    public void TestStartMovement()
+    public void SetAgentPositionToTile(Tile tile)
     {
-            List<Tile> path = null;
+        startAgent.transform.position = tile.transform.position;
+        tile.TileisStart = true;
+        if(lastStarttile != null) lastStarttile.TileisStart = false;
 
-            float startTime = Time.realtimeSinceStartup;
+        lastStarttile = tile;
 
-        for(int i =0; i < 1; i++)
-        {
-             path = PathfindingManager.instance.AStarAlgorithmPathfinding(TileManager.instance.GetTileByIndex(0,0),TileManager.instance.GetTileByIndex(9,7));
-        }
+    }
 
-        Debug.Log(Time.realtimeSinceStartup - startTime);
+    public void SetTargetPositionToTile(Tile tile)
+    {
+        targetObject.transform.position = tile.transform.position;
+        tile.TileisTarget = true;
+        if(lastTargetTile != null) lastTargetTile.TileisTarget = false;
 
-        startAgent.transform.position = TileManager.instance.GetTilePositionByIndex(0,0);
-        targetObject.transform.position = TileManager.instance.GetTilePositionByIndex(9,7);
+        lastTargetTile = tile;
 
-        startAgent.StartMovement(path);
     }
 
 

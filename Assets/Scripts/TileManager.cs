@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class TileManager : MonoBehaviour
 {
+
+    public static TileManager instance;
+    
     [SerializeField] private int columnValue;
     [SerializeField] private int rowValue;
     [SerializeField] private float distanceX = 1.15f;
@@ -13,7 +16,8 @@ public class TileManager : MonoBehaviour
 
     private List<Tile> tiles = new List<Tile>();
 
-    public static TileManager instance;
+    
+    public List<Tile> Tiles {get {return tiles;}}
 
     private void Awake() 
     {
