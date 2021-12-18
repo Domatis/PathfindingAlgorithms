@@ -75,5 +75,17 @@ public class TileManager : MonoBehaviour
 
         return result;
     }
+
+    public void ResetTileStats()
+    {
+        for(int i=0; i < Tiles.Count;i++)
+        {
+            Tiles[i].GCost = 0;
+            Tiles[i].HCost = int.MaxValue;
+            Tiles[i].ParentTile = null;
+            Tiles[i].ResetVisualSprites();
+
+        }
+    }
     
 }

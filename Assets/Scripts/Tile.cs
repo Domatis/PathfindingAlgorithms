@@ -10,6 +10,7 @@ public class Tile : MonoBehaviour
     [SerializeField] private GameObject blockSpriteObj;
     [SerializeField] private GameObject closedSpriteObj;
     [SerializeField] private GameObject openSpriteObj;
+    [SerializeField] private GameObject currentSpriteObj;
 
     private int xPos;
     private int yPos;
@@ -52,17 +53,38 @@ public class Tile : MonoBehaviour
         blockSpriteObj.SetActive(tileBlocked);
     }
 
+    public void SetTileOpen(bool state)
+    {
+        openSpriteObj.SetActive(state);
+        closedSpriteObj.SetActive(!state);
+        currentSpriteObj.SetActive(!state);
+    }
+
+    public void SetTileClosed(bool state)
+    {
+        closedSpriteObj.SetActive(state);
+        openSpriteObj.SetActive(!state);
+        currentSpriteObj.SetActive(!state);
+    }
+
+    public void SetTileCurrent(bool state)
+    {
+        currentSpriteObj.SetActive(state);
+        closedSpriteObj.SetActive(!state);
+        openSpriteObj.SetActive(!state);
+    }
+
+    public void ResetVisualSprites()
+    {
+        openSpriteObj.SetActive(false);
+        closedSpriteObj.SetActive(false);
+        currentSpriteObj.SetActive(false);
+    }
+
     public bool IsTileBlocked()
     {
         return tileBlocked;
     }
-
-    private void OnMouseDown() 
-    {
-        if(EventSystem.current.IsPointerOverGameObject()) return;
-        UIManager.instance.ActiveDropdownMenu(transform.position,this);
-    }
-
 
     public void UpdateValues(Tile parenttile,int gcost,int hcost)
     {
