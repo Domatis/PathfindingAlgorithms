@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class PathfindingManager : MonoBehaviour
 {
-
-
-
     public enum Algorithms {Astar,Dijkstra}
 
     public static PathfindingManager instance;
@@ -19,10 +16,10 @@ public class PathfindingManager : MonoBehaviour
         instance = this;
     }
 
-
     public List<Tile> AStarAlgorithmPathfinding(Tile startTile, Tile targetTile,ref int exploredTileCount)
     {
 
+        //Gerekli listeler.
         List<Tile> path = new List<Tile>();
         List<Tile> openList = new List<Tile>();
         List<Tile> closedList = new List<Tile>();
@@ -34,11 +31,10 @@ public class PathfindingManager : MonoBehaviour
 
         while(openList.Count > 0)
         {
-            //Check the current tile first is it targettile or not.
+            //Var olan tile'ın hedef mi değil mi kontrol edilmesi.
             if(currentTile == targetTile)
             {
-                //Find the parents of the targettile to start tile and add to tiles to path list and return it.
-
+                //Hedef bulunduktan sonra pathin oluşması için hedeften geriye doğru parent tileların bulunması ve listeye eklenmesi.
                 while(currentTile.ParentTile != null)
                 {
                     path.Add(currentTile);
@@ -51,40 +47,40 @@ public class PathfindingManager : MonoBehaviour
 
             else
             {   
-                //Remove current tile from open list and add it to closed list.
+                //Listelerin güncellenmesi
                 openList.Remove(currentTile);
                 closedList.Add(currentTile);
                 exploredTileCount ++;
 
-                //Find the successors of current tile. 
-                for(int i =0; i < 8;i++)    //Max number of successor count.
+                //Var olan tile'ın genişletilmesi ve komşularının bulunması. 
+                for(int i =0; i < 8;i++)    //Maximum oluşabilecek komşu sayısına göre döngü.
                 {
                     CalculateSuccessorIndexValues(i,currentTile.XPos,currentTile.YPos,out int successorColumnVal, out int successorRowVal);
              
                     Tile successor = TileManager.instance.GetTileByIndex(successorColumnVal,successorRowVal);
-                    //Check the successors tiles that they'r blocked if they blocked just skip.
+                    //Bulunan tile'ın null olmaması veye blocked olmaması veya önceden ziyaret edilip edilmediğinin kontrolü.
                     if(successor == null) continue; 
                     if(successor.IsTileBlocked() || closedList.Contains(successor)) continue;
-                    //Calculate successor current fcost, 
+                    //Bulunan tile'ın f cost hesaplanması.---
                     int currentSuccessorGCost = currentTile.GCost + CalculateDistanceCostBetWeenTiles(currentTile,successor);
                     int currentSuccessorHCost = CalculateDistanceCostBetWeenTiles(successor,targetTile);
                     int currentSuccessorFcost = currentSuccessorGCost+currentSuccessorHCost;
 
                     if(currentSuccessorFcost < successor.FCost)
                     {  
-                        //if it's current fcost higher than current one update it's cost values and parent tile.
+                        //Şuan hesaplanan fcost bulunan tiledan daha az ise güncellenip parentinin de güncellemesi.
                         successor.GCost =  currentSuccessorGCost;
                         successor.HCost = currentSuccessorHCost;
                         successor.ParentTile = currentTile;
                     }   
 
-                    //Check wheter they'r at open list or not add them to the open list if necessary.
+                    //Openliste de değil ise listeye eklenmesi.
                     if(!openList.Contains(successor)) openList.Add(successor);
                 }
 
-                //At the end check the openlist and find the lowest fcost tile and set the currenttile to it.
+                //Bir sonra ki döngü için en düşük fcost bulunması.
 
-                int nextTileIndex = 0 ;// For reference
+                int nextTileIndex = 0 ;//
                 bool tileFound = false;
 
                 for(int i= 0; i < openList.Count;i++)
@@ -100,12 +96,13 @@ public class PathfindingManager : MonoBehaviour
             }
         }
 
-        //If could'nt find and open list and just return null.
+        //Path bulunmadıysa null dönülmesi.
         return null;
     }
 
     public List<Tile> DijkstraAlgorithmPathfinding(Tile startTile, Tile targetTile, ref int exploredTiles)
     {
+        //Gerekli listeler.
         List<Tile> path = new List<Tile>();
         List<Tile> openList = new List<Tile>();
         List<Tile> closedList = new List<Tile>();
@@ -117,10 +114,10 @@ public class PathfindingManager : MonoBehaviour
 
         while(openList.Count > 0)
         {
-            //Check the current tile first is it targettile or not.
+            //Var olan tile'ın hedef mi değil mi kontrol edilmesi.
             if(currentTile == targetTile)
             {
-                //Find the parents of the targettile to start tile and add to tiles to path list and return it.
+                //Hedef bulunduktan sonra pathin oluşması için hedeften geriye doğru parent tileların bulunması ve listeye eklenmesi.
 
                 while(currentTile.ParentTile != null)
                 {
@@ -134,37 +131,37 @@ public class PathfindingManager : MonoBehaviour
 
             else
             {   
-                //Remove current tile from open list and add it to closed list.
+                //Listelerin güncellenmesi
                 openList.Remove(currentTile);
                 closedList.Add(currentTile);
                 exploredTiles++;
 
-                //Find the successors of current tile. 
-                for(int i =0; i < 8;i++)    //Max number of successor count.
+                //Var olan tile'ın genişletilmesi ve komşularının bulunması. 
+                for(int i =0; i < 8;i++)    //Maximum oluşabilecek komşu sayısına göre döngü.
                 {
                     CalculateSuccessorIndexValues(i,currentTile.XPos,currentTile.YPos,out int successorColumnVal, out int successorRowVal);
              
                     Tile successor = TileManager.instance.GetTileByIndex(successorColumnVal,successorRowVal);
-                    //Check the successors tiles that they'r blocked if they blocked just skip.
+                    //Bulunan tile'ın null olmaması veye blocked olmaması veya önceden ziyaret edilip edilmediğinin kontrolü.
                     if(successor == null) continue; 
                     if(successor.IsTileBlocked() || closedList.Contains(successor)) continue;
-                    //Calculate successor current fcost, 
+                    //Bulunan tile'ın f cost hesaplanması.
                     int currentSuccessorGCost = currentTile.GCost + CalculateDistanceCostBetWeenTiles(currentTile,successor);
                     
                     if(currentSuccessorGCost < successor.GCost || successor.GCost == 0)
                     {  
-                        //if it's current fcost higher than current one update it's cost values and parent tile.
+                        //Şuan hesaplanan fcost bulunan tiledan daha az ise güncellenip parentinin de güncellemesi.
                         successor.GCost =  currentSuccessorGCost;
                         successor.ParentTile = currentTile;
                     }   
 
-                    //Check wheter they'r at open list or not add them to the open list if necessary.
+                    //Openliste de değil ise listeye eklenmesi.
                     if(!openList.Contains(successor)) openList.Add(successor);
                 }
 
-                //At the end check the openlist and find the lowest fcost tile and set the currenttile to it.
+                //Bir sonra ki döngü için en düşük fcost bulunması.
 
-                int nextTileIndex = 0 ;// For reference
+                int nextTileIndex = 0 ;
                 bool tileFound = false;
 
                 for(int i= 0; i < openList.Count;i++)
@@ -180,7 +177,7 @@ public class PathfindingManager : MonoBehaviour
             }
         }
 
-        //If could'nt find and open list and just return null.
+         //Path bulunmadıysa null dönülmesi.
         return null;
     }
 
